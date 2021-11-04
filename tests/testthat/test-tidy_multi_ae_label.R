@@ -80,7 +80,7 @@ test_that("compare tidy_multi_ae_label(db = ..., db_N = ..., ae_interested = ...
     res_new <- res_new %>%
       select(treatment, ae, stratum, USUBJID) %>%
       complete(treatment, ae, stratum) %>% # fill it with 0
-      group_by(treatment, ae) %>% # group_by(treatment, ae) %>%
+      group_by(treatment, ae, stratum) %>% # group_by(treatment, ae) %>%
       summarise(n = n_distinct(USUBJID, na.rm = TRUE)) %>% # summarise(n = n()) %>%
       mutate(ae_label = temp_ae_label) %>% # give a label to the AE without filter
       left_join(db_N) %>%

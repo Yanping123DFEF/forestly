@@ -26,7 +26,7 @@ The interactive features include:
 - Labels can be revealed by hovering the mouse over a point.
 - Details can be listed by clicking $\blacktriangledown$.
 - Search bars are embedded for users to find the targeted adverse events (AE).
-- AE tables can be downloaded as .rft files.
+- AE tables can be downloaded as .rtf files.
 - Filters can be applied, i.e., filter the 
 
   - discontinued due to an adverse event;
@@ -37,9 +37,9 @@ The interactive features include:
 The procedures to generate a forest plot with the above interactive features are listed as follows.
 
 - Step 0: Get standardized _adsl_ and _adae_ tables. 
-- Step 1: Use `tidy_ae_table2()` function (developed in this package) to get a tidy AE table.
-- Step 2: Use `download_ae()` function (developed in this package) to generate a download button If you click this download button, you will download a .zip file, which consists AE summary table with custom filters, for example, serious AE, drug-related AE, etc.
-- Step 3: Use `plot_forest()` function (developed in this package) to generate an interactive forest plot. 
+- Step 1: Use `tidy_ae_table()` function (developed in this package) to get a tidy AE table.
+- Step 2: Use `tlf_download()` function (developed in this package) to generate a download button If you click this download button, you will download a .zip file, which consists AE summary table with custom filters, for example, serious AE, drug-related AE, etc.
+- Step 3: Use `forestly()` function (developed in this package) to generate an interactive forest plot. 
 
 # Load Required Packages 
 ```{r setup}

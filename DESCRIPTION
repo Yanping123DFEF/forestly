@@ -33,7 +33,8 @@ Suggests:
     ggplot2,
     crosstool,
     tibble,
-    stringr
+    stringr,
+    flexdashboard
 Depends: 
     R (>= 3.6)
 Remotes: bwlewis/crosstool
