@@ -3,8 +3,9 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   design_plan: design_plan.html
+  dmc_report: dmc_report.html
   example: example.html
   onboarding: onboarding.html
   rate_compare: rate_compare.html
-last_built: 2021-10-20T03:41Z
+last_built: 2021-11-04T01:48Z
 

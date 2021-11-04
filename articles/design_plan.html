@@ -58,6 +58,9 @@
       <a href="../articles/design_plan.html">Design Plan of R Package forestly</a>
     </li>
     <li>
+      <a href="../articles/dmc_report.html">Interactive Safety Reports for DMC</a>
+    </li>
+    <li>
       <a href="../articles/example.html">Interactive Forest Plot for DMC</a>
     </li>
     <li>
@@ -178,7 +181,7 @@ tlf_download()    # download the above tables</a></code></pre>
 <a href="#main-function-3-forestly" class="anchor"></a>Main function 3: <code>forestly()</code>
 </h1>
 <p>This function generates an interactive forest plot for the returned objected of <code><a href="../reference/tidy_ae_table.html">tidy_ae_table()</a></code>. For this interactive forstly plot, it consists two blocks.</p>
-<p>The first block is a select list. The items listed in the select list is specified by the <code>ae_label =</code> in function <code><a href="../reference/tidy_ae_table.html">tidy_ae_table(..., ae_interested = , ...)</a></code>. By clicking different AE labels, different reactable will be generated. For example, if you click “serious AE”, then the reactable will only display the serious AE summary table. The main tool to develop this block is <code><a href="https://rdrr.io/pkg/crosstalk/man/filter_select.html">crosstalk::filter_select()</a></code>.</p>
+<p>The first block is a select list. The items listed in the select list is specified by the <code>ae_label =</code> in function <code>tidy_ae_table(..., ae_interested = , ...)</code>. By clicking different AE labels, different reactable will be generated. For example, if you click “serious AE”, then the reactable will only display the serious AE summary table. The main tool to develop this block is <code><a href="https://rdrr.io/pkg/crosstalk/man/filter_select.html">crosstalk::filter_select()</a></code>.</p>
 <p>The second block is a reactable. The reactable summarizes the AE information under the selected AE label. The main tool to develop this block is <code><a href="https://glin.github.io/reactable/reference/reactable.html">reactable::reactable()</a></code>.</p>
 <p>There are some utility functions used to develop <code><a href="../reference/forestly.html">forestly()</a></code> and we listed them as follows.</p>
 <ul>

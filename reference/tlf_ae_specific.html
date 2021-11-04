@@ -101,6 +101,9 @@ Total, confidence interval, or P-value columns." />
       <a href="../articles/design_plan.html">Design Plan of R Package forestly</a>
     </li>
     <li>
+      <a href="../articles/dmc_report.html">Interactive Safety Reports for DMC</a>
+    </li>
+    <li>
       <a href="../articles/example.html">Interactive Forest Plot for DMC</a>
     </li>
     <li>
@@ -156,7 +159,8 @@ Total, confidence interval, or P-value columns.</p>
   <span class='va'>title_text</span>,
   <span class='va'>subtitle_text</span>,
   <span class='va'>end_notes</span>,
-  <span class='va'>output_name</span>
+  output_report <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"ae0specific.rtf"</span><span class='op'>)</span>,
+  output_dataframe <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"ae0specific.RData"</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -224,33 +228,40 @@ Default is NULL, for which nonstratified MN analysis will be conducted. If speci
       <td><p>A vector of text strings to appear in the footnote.</p></td>
     </tr>
     <tr>
-      <th>output_name</th>
-      <td><p>A text string to output the table, can be specified with the path together. If no path specified, the default path will be used to save the table.</p></td>
+      <th>output_report</th>
+      <td><p>A text string to output the rtf table, can be specified with the path together.
+If no path specified, the default path will be used to save the table.</p></td>
+    </tr>
+    <tr>
+      <th>output_dataframe</th>
+      <td><p>A text string to output the rtf R object, like "./ae_summary.Rdata".
+It can be specified with the path together. If no path specified, the default path will be used to save the table.</p></td>
     </tr>
     </table>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
-<span class='fu'>tlf_ae_specific</span><span class='op'>(</span>population_from <span class='op'>=</span> <span class='va'>adsl</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span><span class='op'>(</span>TRTA<span class='op'>=</span><span class='va'>TRT01A</span><span class='op'>)</span>,
-observation_from <span class='op'>=</span> <span class='va'>adae</span>,
-population_where <span class='op'>=</span> <span class='st'>"ITTFL == 'Y'"</span>,
-observation_where <span class='op'>=</span> <span class='st'>"TRTEMFL == 'Y'"</span>,
-treatment_var <span class='op'>=</span> <span class='st'>"TRTA"</span>,
-treatment_order <span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MK9999"</span> <span class='op'>=</span> <span class='st'>"Xanomeline High Dose"</span>, <span class='st'>"Placebo"</span> <span class='op'>=</span> <span class='st'>"Placebo"</span><span class='op'>)</span>,
-ae_var <span class='op'>=</span> <span class='st'>"AEDECOD"</span>,
-ae_grp <span class='op'>=</span> <span class='st'>"AEBODSYS"</span>,
-display_ci <span class='op'>=</span> <span class='cn'>FALSE</span>,
-display_total <span class='op'>=</span> <span class='cn'>FALSE</span>,
-display_pval <span class='op'>=</span> <span class='cn'>FALSE</span>,
-stratum_var <span class='op'>=</span> <span class='cn'>NULL</span>,
-title_text <span class='op'>=</span> <span class='st'>"Participants With Adverse Events by System Organ Class and Preferred Term"</span>,
-subtitle_text <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"(Incidence &gt; 0% in More or More Treatment Group)"</span>,<span class='st'>"(APaT Population)"</span><span class='op'>)</span>,
-end_notes <span class='op'>=</span> <span class='st'>"Every subject is counted a single time for each applicable row and column.
-Database Cutoff Date: 01SEP2021."</span>,
-output_name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>'s01specific0ae0soc.rtf'</span><span class='op'>)</span><span class='op'>)</span>
-
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>temp_dir</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>tlf_ae_specific</span><span class='op'>(</span>population_from <span class='op'>=</span> <span class='va'>adsl</span> <span class='op'><a href='%>%.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span><span class='op'>(</span>TRTA<span class='op'>=</span><span class='va'>TRT01A</span><span class='op'>)</span>,</span>
+<span class='r-in'>observation_from <span class='op'>=</span> <span class='va'>adae</span>,</span>
+<span class='r-in'>population_where <span class='op'>=</span> <span class='st'>"ITTFL == 'Y'"</span>,</span>
+<span class='r-in'>observation_where <span class='op'>=</span> <span class='st'>"TRTEMFL == 'Y'"</span>,</span>
+<span class='r-in'>treatment_var <span class='op'>=</span> <span class='st'>"TRTA"</span>,</span>
+<span class='r-in'>treatment_order <span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"MK9999"</span> <span class='op'>=</span> <span class='st'>"Xanomeline High Dose"</span>, <span class='st'>"Placebo"</span> <span class='op'>=</span> <span class='st'>"Placebo"</span><span class='op'>)</span>,</span>
+<span class='r-in'>ae_var <span class='op'>=</span> <span class='st'>"AEDECOD"</span>,</span>
+<span class='r-in'>ae_grp <span class='op'>=</span> <span class='st'>"AEBODSYS"</span>,</span>
+<span class='r-in'>display_ci <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span class='r-in'>display_total <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span class='r-in'>display_pval <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span class='r-in'>stratum_var <span class='op'>=</span> <span class='cn'>NULL</span>,</span>
+<span class='r-in'>title_text <span class='op'>=</span> <span class='st'>"Participants With Adverse Events by System Organ Class and Preferred Term"</span>,</span>
+<span class='r-in'>subtitle_text <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"(Incidence &gt; 0% in More or More Treatment Group)"</span>,<span class='st'>"(APaT Population)"</span><span class='op'>)</span>,</span>
+<span class='r-in'>end_notes <span class='op'>=</span> <span class='st'>"Every subject is counted a single time for each applicable row and column.</span>
+<span class='r-in'>Database Cutoff Date: 01SEP2021."</span>,</span>
+<span class='r-in'>output_report <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>temp_dir</span>, <span class='st'>'ae0specific.rtf'</span><span class='op'>)</span>,</span>
+<span class='r-in'>output_dataframe <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='va'>temp_dir</span>, <span class='st'>'ae0specific.RData'</span><span class='op'>)</span><span class='op'>)</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
