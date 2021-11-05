@@ -12,7 +12,9 @@ forestly(
   fig_diff_color = "black",
   fig_diff_label = NULL,
   fig_diff_colwidth = 300,
-  small_sample = NULL
+  small_sample = NULL,
+  forest_table_width = 1200,
+  forest_table_bottom_margin = 50
 )
 }
 \arguments{

@@ -60,7 +60,9 @@ forestly <- function(db,
                      fig_diff_color = "black", 
                      fig_diff_label = NULL,
                      fig_diff_colwidth = 300,
-                     small_sample = NULL){
+                     small_sample = NULL,
+                     forest_table_width = 1200,
+                     forest_table_bottom_margin = 50){
   
   # Check the correctness of input
   if(length(fig_prop_color) != 2){
@@ -188,8 +190,11 @@ forestly <- function(db,
     # Make a reactable 
     mk_reactable(  #mk_reactable saved in the R/ folder: define default behavior of reactable.
       
-      # data frame to plot
+      # Data frame to plot
       t_display1,
+      
+      # Define the width of the reactable, i.e., the forest plot table
+      width = forest_table_width,
       
       # Default sort variable
       defaultSorted = c("ae_label", "fig_diff"),
@@ -260,7 +265,7 @@ forestly <- function(db,
               # Reset optional vector of crosstalk group keys;
               # Use with init when data == relay (one crosstalk group) to 
               # Reset the initial filter/select handle.
-              reset = rownames(t_display), height = 50)
+              reset = rownames(t_display), height = forest_table_bottom_margin)
   )
   
   

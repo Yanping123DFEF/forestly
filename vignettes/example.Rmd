@@ -185,7 +185,9 @@ forestly(db,
          fig_prop_label = NULL, # c("Treatment", "Placebo"), 
          fig_diff_color = "black", 
          fig_diff_label = NULL, # "Treatment <- Favor -> Placebo",
-         small_sample = c(4, 4)) 
+         small_sample = c(4, 4),
+         forest_table_width = 800,
+         forest_table_bottom_margin = 30) 
 ```
 
 
