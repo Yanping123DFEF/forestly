@@ -230,7 +230,7 @@ forestly <- function(db,
               # Reset optional vector of crosstalk group keys;
               # Use with init when data == relay (one crosstalk group) to 
               # Reset the initial filter/select handle.
-              reset = rownames(t_display))
+              reset = rownames(t_display), height = 50)
   )
   
   
