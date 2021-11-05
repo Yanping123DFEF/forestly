@@ -46,6 +46,10 @@ the default value is 300}
 
 \item{small_sample}{a integral vector of length 2. The first element is for treatment group and
 the second element is for control group. The default value is c(4, 4).}
+
+\item{forest_table_width}{the width of the forest plot reactbale}
+
+\item{forest_table_bottom_margin}{the bottom margin of the forest plot reactable}
 }
 \value{
 a reactable with a select list

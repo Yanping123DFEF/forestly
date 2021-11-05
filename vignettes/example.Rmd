@@ -107,7 +107,8 @@ db <- tidy_ae_table(population_from  = adsl %>% rename(TRTA = TRT01A),
                     stratum_var = "STRATUMN", #if there is not stratum, then stratum_var = NULL
                     #stratum_var = NULL,
                     ae_var = "AEDECOD",
-                    ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 'AEREL != "NONE"',
+                    ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 
+                                                                           'AEREL != "NONE"',
                                                                            'Grade3To5Flag == "Y"', 
                                                                            'AEACN == "DRUG WITHDRAWN"'),
                                                           ae_label = c("with serious adverse events",
@@ -118,62 +119,63 @@ db <- tidy_ae_table(population_from  = adsl %>% rename(TRTA = TRT01A),
                                                                            "AETERM", "TRTA", "ADURN", "ADURU",
                                                                            "AESEV",  "AESER", "AEREL", "AEACN", "AEOUT"),
                                                            listing_label = c("Site Number", "Participant ID", "Gender", "Race", "Age",
-                                                                             "AE", "Onset Epoch", "Duration", "Duration", 
+                                                                             "Adverse Event", "Onset Epoch", "Duration", "Duration", 
                                                                              "Intensity", "Serious", "Related", "Action Taken",
-                                                                             "Outcome"))
+                                                                             "Outcome")),
+                    ae_listing_label = "Adverse Event"
                     )
 ```
 
 # Download the AE Summary Count Table
 
 ```{r}
-temp_dir <- tempdir()
-ae_summary <- tlf_ae_summary(population_from = adsl %>% rename(TRTA = TRT01A),
-                             observation_from = adae,
-                             population_where = "ITTFL=='Y'",
-                             observation_where = NULL,
-                             treatment_var = "TRTA",
-                             treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
-                             ae_var = "AEDECOD",
-                             ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 
-                                                                                    'AEREL != "NONE"',
-                                                                                    'Grade3To5Flag == "Y"',
-                                                                                    'AEACN == "DRUG WITHDRAWN"'),
-
-                                                                   ae_label = c("with serious adverse events",
-                                                                                "with drug-related adverse events",
-                                                                                "with toxicity grade 3-5 adverse events",
-                                                                                "discontinued due to an adverse event")),
-                             #stratum_var = "STRATUMN", 
-                             stratum_var = NULL,
-                             display_ci = TRUE,
-                             display_total = FALSE,
-                             title_text = "Analysis of Adverse Event Summary",
-                             subtitle_text = NULL,
-                             end_notes = "Every subject is counted a single time for each applicable row and column.",
-                             output_report = file.path(temp_dir, 'ae0summary.rtf'),
-                             output_dataframe = file.path(temp_dir, 'ae0summary.RData'))
-
-ae_spec <- tlf_ae_specific(population_from = adsl %>% rename(TRTA=TRT01A),
-                           observation_from = adae,
-                           population_where = "ITTFL == 'Y'",
-                           observation_where = NULL,
-                           treatment_var = "TRTA",
-                           treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
-                           ae_var = "AEDECOD",
-                           ae_grp = "AEBODSYS",
-                           stratum_var = "STRATUMN", #stratum_var = NULL,
-                           display_ci = FALSE,
-                           display_total = FALSE,
-                           display_pval = FALSE,
-                           title_text = "Participants With Adverse Events by System Organ Class and Preferred Term",
-                           subtitle_text = c("(Incidence > 0% in More or More Treatment Group)","(APaT Population)"),
-                           end_notes = "Every subject is counted a single time for each applicable row and column.
-Database Cutoff Date: 01SEP2021.",
-                           output_report = file.path(temp_dir, 's01specific0ae0soc.rtf'),
-                           output_dataframe = file.path(temp_dir, 'ae0spec.RData'))
-
-tlf_download(temp_dir)
+# temp_dir <- tempdir()
+# ae_summary <- tlf_ae_summary(population_from = adsl %>% rename(TRTA = TRT01A),
+#                              observation_from = adae,
+#                              population_where = "ITTFL=='Y'",
+#                              observation_where = NULL,
+#                              treatment_var = "TRTA",
+#                              treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
+#                              ae_var = "AEDECOD",
+#                              ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 
+#                                                                                     'AEREL != "NONE"',
+#                                                                                     'Grade3To5Flag == "Y"',
+#                                                                                     'AEACN == "DRUG WITHDRAWN"'),
+# 
+#                                                                    ae_label = c("with serious adverse events",
+#                                                                                 "with drug-related adverse events",
+#                                                                                 "with toxicity grade 3-5 adverse events",
+#                                                                                 "discontinued due to an adverse event")),
+#                              #stratum_var = "STRATUMN", 
+#                              stratum_var = NULL,
+#                              display_ci = TRUE,
+#                              display_total = FALSE,
+#                              title_text = "Analysis of Adverse Event Summary",
+#                              subtitle_text = NULL,
+#                              end_notes = "Every subject is counted a single time for each applicable row and column.",
+#                              output_report = file.path(temp_dir, 'ae0summary.rtf'),
+#                              output_dataframe = file.path(temp_dir, 'ae0summary.RData'))
+# 
+# ae_spec <- tlf_ae_specific(population_from = adsl %>% rename(TRTA=TRT01A),
+#                            observation_from = adae,
+#                            population_where = "ITTFL == 'Y'",
+#                            observation_where = NULL,
+#                            treatment_var = "TRTA",
+#                            treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
+#                            ae_var = "AEDECOD",
+#                            ae_grp = "AEBODSYS",
+#                            stratum_var = "STRATUMN", #stratum_var = NULL,
+#                            display_ci = FALSE,
+#                            display_total = FALSE,
+#                            display_pval = FALSE,
+#                            title_text = "Participants With Adverse Events by System Organ Class and Preferred Term",
+#                            subtitle_text = c("(Incidence > 0% in More or More Treatment Group)","(APaT Population)"),
+#                            end_notes = "Every subject is counted a single time for each applicable row and column.
+# Database Cutoff Date: 01SEP2021.",
+#                            output_report = file.path(temp_dir, 's01specific0ae0soc.rtf'),
+#                            output_dataframe = file.path(temp_dir, 'ae0spec.RData'))
+# 
+# tlf_download(temp_dir)
 ```
 
 
@@ -186,7 +188,7 @@ forestly(db,
          fig_diff_color = "black", 
          fig_diff_label = NULL, # "Treatment <- Favor -> Placebo",
          small_sample = c(4, 4),
-         forest_table_width = 800,
+         forest_table_width = 1200,
          forest_table_bottom_margin = 30) 
 ```
 

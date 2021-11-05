@@ -14,6 +14,7 @@ mk_reactable(
   striped = TRUE,
   highlight = TRUE,
   fullWidth = TRUE,
+  width = 1200,
   theme = reactableTheme(cellPadding = "0px 8px"),
   ...
 )
@@ -37,13 +38,13 @@ mk_reactable(
 
 \item{fullWidth}{Stretch the table to fill the full width of its container? Defaults to TRUE.}
 
+\item{width}{Width of the table in pixels. Defaults to "auto" for automatic sizing.}
+
 \item{theme}{Theme options for the table.
 The default value is \code{reactableTheme(cellPadding = "0px 8px")}:
 No padding between two cells (ensure no break line between reference line)}
 
 \item{...}{Additional arguments transferred to reactable.}
-
-\item{width}{Width of the table in pixels. Defaults to "auto" for automatic sizing.}
 }
 \value{
 an interactive data table.

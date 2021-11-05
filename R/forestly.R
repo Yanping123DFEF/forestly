@@ -21,6 +21,9 @@
 #'                          the default value is 300
 #' @param small_sample a integral vector of length 2. The first element is for treatment group and 
 #'                     the second element is for control group. The default value is c(4, 4).
+#' @param forest_table_width the width of the forest plot reactbale
+#' @param forest_table_bottom_margin the bottom margin of the forest plot reactable
+#' 
 #' @return a reactable with a select list
 #' @export
 #'
@@ -202,10 +205,21 @@ forestly <- function(db,
       
       # Define listing of subjects
       details = function(index){
-        t_row <- t_display[index, ]
-        subset(t_detail, 
-               toupper(AE) %in% toupper(t_row$ae)) %>% mk_reactable
+        ae_label_idx = -1
+        for (i in seq_along(t_detail)) {
+          if(t_display[index, ]$ae_label == t_detail[[i]]$ae_label){
+            ae_label_idx <- i
+            break
+          }
+        }
+        subset(t_detail[[ae_label_idx]]$ae_listing,
+               toupper(t_detail[[ae_label_idx]]$ae_listing[[db$ae_listing_label]]) %in% toupper(t_display[index, ]$ae)) %>% mk_reactable
       },
+      # details = function(index){
+      #   t_row <- t_display[index, ]
+      #   subset(t_detail,
+      #          toupper(AE) %in% toupper(t_row$ae)) %>% mk_reactable
+      # },
       
       # Customize cell feature
       columnGroups = list(
