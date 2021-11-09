@@ -59,28 +59,29 @@ Generate interactive forest plot with a select list as filter
 }
 \examples{
 \dontrun{
-library(dplyr)
-library(crosstalk)
-library(crosstool)
-tb <- data.frame(ae = c("headache", "pain", "fever", "running nose", 
-                        "fever", "headache", "running nose"),
-                 ae_label = c("ALL", "ALL", "ALL", "ALL", "AESER", "AEREL", "AEREL"),
-                 n_1 = c(40, 50, 30, 50, 30, 30, 50),
-                 n_2 = c(20, 30, 10, 50, 10, 10, 30),
-                 N_1 = rep(60, 7),
-                 N_2 = rep(60, 7),
-                 stratum = rep("NULL", 7))
-tb <- tb \%>\% mutate(pct_1 = n_1/N_1 * 100, pct_2 = n_2/N_2 * 100)
-db <- list(table = tb, listing = tb \%>\% rename(AE = ae),
-           sample_size = tibble(treatment = c("treatment", "control"), N = c(60, 60)),
-           treatment_order = c("MK9999" = "Xanomeline", "Placebo" = "Placebo"))
-
+db <- tidy_ae_table(population_from  = adsl \%>\% rename(TRTA = TRT01A),
+                    observation_from = adae,
+                    population_where = NULL,
+                    observation_where = NULL,
+                    treatment_var = "TRTA",
+                    treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
+                    stratum_var = "STRATUMN", #if there is not stratum, then stratum_var = NULL
+                    #stratum_var = NULL,
+                    ae_var = "AEDECOD",
+                    ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 
+                                                                           'AEREL != "NONE"'),
+                                                          ae_label = c("with serious adverse events",
+                                                                       "with drug-related adverse events")),
+                    listing_interested = define_ae_listing(listing_var = c("USUBJID", "SEX", "AGE", "AEDECOD"),
+                                                           listing_label = c("ID", "Gender", "Age", "Adverse Event")),
+                    ae_listing_label = "Adverse Event")
+## Generate interavtive forest plot
 forestly(db)
-forestly(db, 
+forestly(db,
          fig_prop_color = c("gold", "purple"),
-         fig_prop_label = NULL,  
-         fig_diff_color = "black", 
-         fig_diff_label = NULL, 
+         fig_prop_label = NULL,
+         fig_diff_color = "black",
+         fig_diff_label = NULL,
          small_sample = c(4, 4))
 }
 }

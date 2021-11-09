@@ -12,7 +12,8 @@
 #' @param stratum_var A character string to define the variable of baseline stratum in 'population_from'.Only one 'stratum_var' is allowed.
 #' @param ae_interested An object returned by function define_ae_select_list()
 #' @param listing_interested  An objected return by function define_ae_listing()
-#' @param ae_listing_label The label of AE to be displayed in subject-level listing
+#' @param ae_listing_label The label of AE to be displayed in subject-level listing, 
+#'                         It should be consistent with that in listing_interested = define_ae_listing(listing_label = ...)
 #' @return Return a standard adverse event data frame
 #' @export
 #' @examples
