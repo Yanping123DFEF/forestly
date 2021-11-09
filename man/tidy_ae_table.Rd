@@ -14,7 +14,8 @@ tidy_ae_table(
   ae_var = ae_var,
   ae_interested = NULL,
   stratum_var = NULL,
-  listing_interested = define_ae_listing()
+  listing_interested = define_ae_listing(),
+  ae_listing_label = "AE"
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ tidy_ae_table(
 \item{stratum_var}{A character string to define the variable of baseline stratum in 'population_from'.Only one 'stratum_var' is allowed.}
 
 \item{listing_interested}{An objected return by function define_ae_listing()}
+
+\item{ae_listing_label}{The label of AE to be displayed in subject-level listing}
 }
 \value{
 Return a standard adverse event data frame

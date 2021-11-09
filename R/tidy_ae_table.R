@@ -12,7 +12,7 @@
 #' @param stratum_var A character string to define the variable of baseline stratum in 'population_from'.Only one 'stratum_var' is allowed.
 #' @param ae_interested An object returned by function define_ae_select_list()
 #' @param listing_interested  An objected return by function define_ae_listing()
-#'
+#' @param ae_listing_label The label of AE to be displayed in subject-level listing
 #' @return Return a standard adverse event data frame
 #' @export
 #' @examples
@@ -40,7 +40,8 @@ tidy_ae_table <- function(population_from,
                           ae_var = ae_var,
                           ae_interested = NULL,
                           stratum_var = NULL,
-                          listing_interested = define_ae_listing()){
+                          listing_interested = define_ae_listing(),
+                          ae_listing_label = "AE"){
 
   # Population Level Tidy Data
   pop <- tidy_population(population_from  = population_from,
@@ -62,9 +63,25 @@ tidy_ae_table <- function(population_from,
   db <- subset(db, USUBJID %in% pop$USUBJID)
   
   # Select the variables to be listed in the detailed listing
-  db_listing <- tidy_ae_listing(db, 
-                                listing_var = listing_interested$listing_var,
-                                listing_label = listing_interested$listing_label)
+  db_listing <- list()
+  for (ae_idx in seq_along(ae_interested$interested_ae_criterion)) {
+    ## Filter the subjects with interested AE
+    temp_db <- eval(parse(text = paste0("subset(db,", ae_interested$interested_ae_criterion[ae_idx], ")")))
+    ## Listing the details of these subjects
+    temp_db_listing <- tidy_ae_listing(temp_db,
+                                       listing_var = listing_interested$listing_var,
+                                       listing_label = listing_interested$listing_label)
+    ## organize it into db_listing
+    db_listing[[ae_idx]] <- list(ae_label = ae_interested$interested_ae_label[ae_idx],
+                                 ae_listing = temp_db_listing)
+  }
+  db_listing[[length(ae_interested$interested_ae_criterion)+1]] <- list(ae_label = "All",
+                                                                        ae_listing = tidy_ae_listing(db,
+                                                                                                     listing_var = listing_interested$listing_var,
+                                                                                                     listing_label = listing_interested$listing_label))
+  # db_listing <- tidy_ae_listing(db, 
+  #                               listing_var = listing_interested$listing_var,
+  #                               listing_label = listing_interested$listing_label)
   
   # count the sample size of each arm
   db_N <- dplyr::count(pop, treatment, stratum, name = "N")
@@ -80,5 +97,6 @@ tidy_ae_table <- function(population_from,
   list(table = res, 
        listing = db_listing, #listing = db[, listing_var],
        sample_size = db_N,
-       treatment_order = treatment_order)
+       treatment_order = treatment_order,
+       ae_listing_label = ae_listing_label)
 }

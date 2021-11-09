@@ -21,6 +21,9 @@
 #'                          the default value is 300
 #' @param small_sample a integral vector of length 2. The first element is for treatment group and 
 #'                     the second element is for control group. The default value is c(4, 4).
+#' @param forest_table_width the width of the forest plot reactbale
+#' @param forest_table_bottom_margin the bottom margin of the forest plot reactable
+#' 
 #' @return a reactable with a select list
 #' @export
 #'
@@ -60,7 +63,9 @@ forestly <- function(db,
                      fig_diff_color = "black", 
                      fig_diff_label = NULL,
                      fig_diff_colwidth = 300,
-                     small_sample = NULL){
+                     small_sample = NULL,
+                     forest_table_width = 1200,
+                     forest_table_bottom_margin = 50){
   
   # Check the correctness of input
   if(length(fig_prop_color) != 2){
@@ -139,6 +144,10 @@ forestly <- function(db,
   t_display$lower[(t_display$n_1 <= small_sample[1] & t_display$n_2 <= small_sample[2])] = 0
   t_display$upper[(t_display$n_1 <= small_sample[1] & t_display$n_2 <= small_sample[2])] = 0
   
+  # Create two variable for slider bar
+  t_display$n_max <- pmax(t_display$n_1, t_display$n_2)
+  t_display$pct_max <- pmax(t_display$pct_1, t_display$pct_2)
+  
   # Make the data frame eligible for check box design
   t_display1 <- crosstalk::SharedData$new(t_display)
   
@@ -158,12 +167,37 @@ forestly <- function(db,
     # Width of the select list and reactable
     widths = c(1.5, 10.5),
     # Make a select list
-    crosstalk::filter_select("filter_AEcategory", "AE filters", t_display1, ~ae_label, multiple = FALSE),
+    crosstalk::filter_select(id = "filter_AEcategory", 
+                             label = "AE filters", 
+                             sharedData = t_display1, 
+                             group = ~ae_label, 
+                             multiple = FALSE),
+    # Make a slider bar of the incidence percentage
+    crosstalk::filter_slider(id = "filter_incidence", 
+                             label = "Incidence (%) in One or More Treatment Groups", 
+                             sharedData = t_display1, 
+                             column = ~pct_max, # whose values will be used for this slider
+                             step = 1,          # specifies interval between each select-able value on the slider
+                             width = 250,       # width of the slider control 
+                             min = 0,           # the leftmost value of the slider
+                             max = 100          # the rightmost value of the slider
+                             ),
+    # Make a slider bar of the AE count
+    crosstalk::filter_slider(id = "filter_count", 
+                             label = "Count in One or More Treatment Groups", 
+                             sharedData = t_display1, 
+                             column = ~n_max, 
+                             step = 1, 
+                             width = 250,
+                             min = 0),
     # Make a reactable 
     mk_reactable(  #mk_reactable saved in the R/ folder: define default behavior of reactable.
       
-      # data frame to plot
+      # Data frame to plot
       t_display1,
+      
+      # Define the width of the reactable, i.e., the forest plot table
+      width = forest_table_width,
       
       # Default sort variable
       defaultSorted = c("ae_label", "fig_diff"),
@@ -171,10 +205,21 @@ forestly <- function(db,
       
       # Define listing of subjects
       details = function(index){
-        t_row <- t_display[index, ]
-        subset(t_detail, 
-               toupper(AE) %in% toupper(t_row$ae)) %>% mk_reactable
+        ae_label_idx = -1
+        for (i in seq_along(t_detail)) {
+          if(t_display[index, ]$ae_label == t_detail[[i]]$ae_label){
+            ae_label_idx <- i
+            break
+          }
+        }
+        subset(t_detail[[ae_label_idx]]$ae_listing,
+               toupper(t_detail[[ae_label_idx]]$ae_listing[[db$ae_listing_label]]) %in% toupper(t_display[index, ]$ae)) %>% mk_reactable
       },
+      # details = function(index){
+      #   t_row <- t_display[index, ]
+      #   subset(t_detail,
+      #          toupper(AE) %in% toupper(t_row$ae)) %>% mk_reactable
+      # },
       
       # Customize cell feature
       columnGroups = list(
@@ -217,7 +262,11 @@ forestly <- function(db,
                                    align = "center", format = reactable::colFormat(digits = 2) ),
         
         lower = reactable::colDef(header = "lower CI", show = FALSE),
-        upper = reactable::colDef(header = "upper CI", show = FALSE)
+        upper = reactable::colDef(header = "upper CI", show = FALSE),
+        
+        # variables helps the slider bar
+        pct_max = reactable::colDef(header = "max proportion", show = FALSE),
+        n_max = reactable::colDef(header = "max count", show = FALSE)
       )
     ),
     crosstool(t_display1,
@@ -230,7 +279,7 @@ forestly <- function(db,
               # Reset optional vector of crosstalk group keys;
               # Use with init when data == relay (one crosstalk group) to 
               # Reset the initial filter/select handle.
-              reset = rownames(t_display))
+              reset = rownames(t_display), height = forest_table_bottom_margin)
   )
   
   
