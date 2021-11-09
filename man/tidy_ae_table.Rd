@@ -39,7 +39,8 @@ tidy_ae_table(
 
 \item{listing_interested}{An objected return by function define_ae_listing()}
 
-\item{ae_listing_label}{The label of AE to be displayed in subject-level listing}
+\item{ae_listing_label}{The label of AE to be displayed in subject-level listing,
+It should be consistent with that in listing_interested = define_ae_listing(listing_label = ...)}
 }
 \value{
 Return a standard adverse event data frame
