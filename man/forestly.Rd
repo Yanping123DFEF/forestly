@@ -59,6 +59,7 @@ Generate interactive forest plot with a select list as filter
 }
 \examples{
 \dontrun{
+library(forestly)
 ## No stratum ----------------------------------------------
 ## Tidy data
 db <- tidy_ae_table(population_from  = adsl \%>\% rename(TRTA = TRT01A),
