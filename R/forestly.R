@@ -29,16 +29,47 @@
 #'
 #' @examples
 #' \dontrun{
+#' library(forestly)
+#' ## No stratum ----------------------------------------------
+#' ## Tidy data
 #' db <- tidy_ae_table(population_from  = adsl %>% rename(TRTA = TRT01A),
 #'                     observation_from = adae,
 #'                     population_where = NULL,
 #'                     observation_where = NULL,
 #'                     treatment_var = "TRTA",
 #'                     treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
-#'                     stratum_var = "STRATUMN", #if there is not stratum, then stratum_var = NULL
-#'                     #stratum_var = NULL,
+#'                     stratum_var = NULL,
 #'                     ae_var = "AEDECOD",
-#'                     ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 
+#'                     ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"',
+#'                                                                            'AEREL != "NONE"'),
+#'                                                           ae_label = c("with serious adverse events",
+#'                                                                        "with drug-related adverse events")),
+#'                     listing_interested = define_ae_listing(listing_var = c("USUBJID", "SEX", "AGE", "AEDECOD"),
+#'                                                            listing_label = c("ID", "Gender", "Age", "Adverse Event")),
+#'                     ae_listing_label = "Adverse Event")
+#' ## Generate interavtive forest plot
+#' forestly(db)
+#' forestly(db,
+#'          fig_prop_color = c("gold", "purple"),
+#'          fig_prop_label = NULL,
+#'          fig_diff_color = "black",
+#'          fig_diff_label = NULL,
+#'          small_sample = c(4, 4))
+#' 
+#' ## With stratum ----------------------------------------------
+#' ## Impute stratum 
+#' adsl$STRATUMN <- sample(seq(1,3), size = length(adsl$USUBJID), prob = c(0.3, 0.3, 0.4), replace = TRUE)
+#' adae <- adae %>% left_join(data.frame(USUBJID = adsl$USUBJID, STRATUMN = adsl$STRATUMN))
+#' ## Tidy data
+#' db <- tidy_ae_table(population_from  = adsl %>% rename(TRTA = TRT01A),
+#'                     observation_from = adae,
+#'                     population_where = NULL,
+#'                     observation_where = NULL,
+#'                     treatment_var = "TRTA",
+#'                     treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
+#'                     stratum_var = "STRATUMN", 
+#'                     ae_var = "AEDECOD",
+#'                     ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"',
 #'                                                                            'AEREL != "NONE"'),
 #'                                                           ae_label = c("with serious adverse events",
 #'                                                                        "with drug-related adverse events")),
@@ -97,30 +128,30 @@ forestly <- function(db,
   }
   
   # Set the order of ae, ae_label
-  db$table <- db$table %>% mutate(ae = as.factor(ae),
-                                  ae_label = as.factor(ae_label)) 
+  db$table <- db$table %>% dplyr::mutate(ae = as.factor(ae),
+                                         ae_label = as.factor(ae_label)) 
   
   # Listing of subjects details
   t_detail <- db$listing
   
   # Count number of events for each AE regardless the stratum
   tb_no_stratum <- db$table %>% 
-    select(-pct_1, -pct_2) %>% 
-    group_by(ae, ae_label) %>% 
-    summarise(n_1 = sum(n_1), n_2 = sum(n_2), N_1 = sum(N_1), N_2 = sum(N_2)) %>% 
-    distinct() %>% 
-    mutate(pct_1 = n_1 / N_1 * 100, pct_2 = n_2 / N_2 * 100)
+    dplyr::select(-pct_1, -pct_2) %>% 
+    dplyr::group_by(ae, ae_label) %>% 
+    dplyr::summarise(n_1 = sum(n_1), n_2 = sum(n_2), N_1 = sum(N_1), N_2 = sum(N_2)) %>% 
+    dplyr::distinct() %>% 
+    dplyr::mutate(pct_1 = n_1 / N_1 * 100, pct_2 = n_2 / N_2 * 100)
   
   # Calculate test using M&N method 
   tb_rate_compare <- as.data.frame(do.call(rbind, 
                                            db$table %>% 
-                                             group_by(ae, ae_label) %>% 
-                                             group_map(~ rate_compare_sum(n0 = .x$N_1, n1 = .x$N_2, 
-                                                                          x0 = .x$n_1, x1 = .x$n_2, 
-                                                                          strata = .x$stratum))))
+                                             dplyr::group_by(ae, ae_label) %>% 
+                                             dplyr::group_map(~ rate_compare_sum(n0 = .x$N_1, n1 = .x$N_2, 
+                                                                                 x0 = .x$n_1, x1 = .x$n_2, 
+                                                                                 strata = .x$stratum))))
   tb <- cbind(tb_no_stratum, tb_rate_compare) %>% 
-    dplyr::mutate_at(vars(pct_1, pct_2, est, lower, upper, p), ~round(., 4)) %>%   # round into 4 digits
-    dplyr::mutate(est = est * 100, lower = lower * 100, upper = upper * 100)       # change 0.1 into 10%
+    dplyr::mutate_at(dplyr::vars(pct_1, pct_2, est, lower, upper, p), ~round(., 4)) %>%   # round into 4 digits
+    dplyr::mutate(est = est * 100, lower = lower * 100, upper = upper * 100)              # change 0.1 into 10%
   # tb <- cbind(db$table,
   #             with(db$table, prop_test_mn(x0 = n_2, n0 = N_2, x1 = n_1, n1 = N_1))) 
   
@@ -224,8 +255,8 @@ forestly <- function(db,
       
       # Customize cell feature
       columnGroups = list(
-        colGroup(name = paste0(fig_prop_label[1], "(N=", as.numeric(sample_size_no_stratum[1, "N"]), ")"),  columns = c("n_1", "pct_1")),
-        colGroup(name = paste0(fig_prop_label[2], "(N=", as.numeric(sample_size_no_stratum[2, "N"]), ")"), columns = c("n_2", "pct_2"))
+        reactable::colGroup(name = paste0(fig_prop_label[1], "(N=", as.numeric(sample_size_no_stratum[1, "N"]), ")"),  columns = c("n_1", "pct_1")),
+        reactable::colGroup(name = paste0(fig_prop_label[2], "(N=", as.numeric(sample_size_no_stratum[2, "N"]), ")"), columns = c("n_2", "pct_2"))
       ),
       
       # List of column definitions
@@ -270,17 +301,17 @@ forestly <- function(db,
         n_max = reactable::colDef(header = "max count", show = FALSE)
       )
     ),
-    crosstool(t_display1,
-              # Transceiver widgets are more like normal crosstalk widgets.
-              class = "transceiver",
-              # Set the initial value
-              init = which(t_display$ae_label == "All"),
-              # Channel set to "filter" to use the crosstalk filter handle
-              channel = "filter",
-              # Reset optional vector of crosstalk group keys;
-              # Use with init when data == relay (one crosstalk group) to 
-              # Reset the initial filter/select handle.
-              reset = rownames(t_display), height = forest_table_bottom_margin)
+    crosstool::crosstool(t_display1,
+                         # Transceiver widgets are more like normal crosstalk widgets.
+                         class = "transceiver",
+                         # Set the initial value
+                         init = which(t_display$ae_label == "All"),
+                         # Channel set to "filter" to use the crosstalk filter handle
+                         channel = "filter",
+                         # Reset optional vector of crosstalk group keys;
+                         # Use with init when data == relay (one crosstalk group) to 
+                         # Reset the initial filter/select handle.
+                         reset = rownames(t_display), height = forest_table_bottom_margin)
   )
   
   
