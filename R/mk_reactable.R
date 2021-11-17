@@ -41,7 +41,7 @@ mk_reactable <- function(data,
                          highlight = TRUE,
                          fullWidth = TRUE,
                          width = 1200,
-                         theme = reactableTheme(cellPadding = "0px 8px"), 
+                         theme = reactable::reactableTheme(cellPadding = "0px 8px"), 
                          ...){
 
   reactable::reactable(data = data,

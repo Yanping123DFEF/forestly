@@ -59,16 +59,46 @@ Generate interactive forest plot with a select list as filter
 }
 \examples{
 \dontrun{
+## No stratum ----------------------------------------------
+## Tidy data
 db <- tidy_ae_table(population_from  = adsl \%>\% rename(TRTA = TRT01A),
                     observation_from = adae,
                     population_where = NULL,
                     observation_where = NULL,
                     treatment_var = "TRTA",
                     treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
-                    stratum_var = "STRATUMN", #if there is not stratum, then stratum_var = NULL
-                    #stratum_var = NULL,
+                    stratum_var = NULL,
                     ae_var = "AEDECOD",
-                    ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 
+                    ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"',
+                                                                           'AEREL != "NONE"'),
+                                                          ae_label = c("with serious adverse events",
+                                                                       "with drug-related adverse events")),
+                    listing_interested = define_ae_listing(listing_var = c("USUBJID", "SEX", "AGE", "AEDECOD"),
+                                                           listing_label = c("ID", "Gender", "Age", "Adverse Event")),
+                    ae_listing_label = "Adverse Event")
+## Generate interavtive forest plot
+forestly(db)
+forestly(db,
+         fig_prop_color = c("gold", "purple"),
+         fig_prop_label = NULL,
+         fig_diff_color = "black",
+         fig_diff_label = NULL,
+         small_sample = c(4, 4))
+
+## With stratum ----------------------------------------------
+## Impute stratum 
+adsl$STRATUMN <- sample(seq(1,3), size = length(adsl$USUBJID), prob = c(0.3, 0.3, 0.4), replace = TRUE)
+adae <- adae \%>\% left_join(data.frame(USUBJID = adsl$USUBJID, STRATUMN = adsl$STRATUMN))
+## Tidy data
+db <- tidy_ae_table(population_from  = adsl \%>\% rename(TRTA = TRT01A),
+                    observation_from = adae,
+                    population_where = NULL,
+                    observation_where = NULL,
+                    treatment_var = "TRTA",
+                    treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
+                    stratum_var = "STRATUMN", 
+                    ae_var = "AEDECOD",
+                    ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"',
                                                                            'AEREL != "NONE"'),
                                                           ae_label = c("with serious adverse events",
                                                                        "with drug-related adverse events")),
