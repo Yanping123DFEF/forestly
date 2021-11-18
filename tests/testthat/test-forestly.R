@@ -6,6 +6,6 @@ test_that("expect errors if fig_prop_colwidth/fig_diff_colwidth is not a positiv
   expect_equal(2 * 2, 4)
 })
 
-test_that("compare forestly() with the combination of filter_select() and mk_reactable()", {
+test_that("compare forestly() with the combination of filter_select(), filter_slider, and mk_reactable()", {
   expect_equal(2 * 2, 4)
 })

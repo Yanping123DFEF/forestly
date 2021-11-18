@@ -178,7 +178,9 @@ forestly <- function(db,
   
   # Create two variable for slider bar
   t_display$n_max <- pmax(t_display$n_1, t_display$n_2)
+  t_display$n_min <- pmin(t_display$n_1, t_display$n_2)
   t_display$pct_max <- pmax(t_display$pct_1, t_display$pct_2)
+  t_display$pct_min <- pmin(t_display$pct_1, t_display$pct_2)
   
   # Make the data frame eligible for check box design
   t_display1 <- crosstalk::SharedData$new(t_display)
@@ -197,7 +199,7 @@ forestly <- function(db,
   # Make a reactable with a select list
   p <- crosstalk::bscols(
     # Width of the select list and reactable
-    widths = c(1.5, 10.5),
+    widths = c(4, 4, 4, 12),
     # Make a select list
     crosstalk::filter_select(id = "filter_AEcategory", 
                              label = "AE filters", 
@@ -208,11 +210,11 @@ forestly <- function(db,
     crosstalk::filter_slider(id = "filter_incidence", 
                              label = "Incidence (%) in One or More Treatment Groups", 
                              sharedData = t_display1, 
-                             column = ~pct_max, # whose values will be used for this slider
-                             step = 1,          # specifies interval between each select-able value on the slider
-                             width = 250,       # width of the slider control 
-                             min = 0,           # the leftmost value of the slider
-                             max = 100          # the rightmost value of the slider
+                             column = ~pct_max,                    # whose values will be used for this slider
+                             step = 1,                             # specifies interval between each select-able value on the slider
+                             #width = 250,                         # width of the slider control 
+                             min = max(0, min(t_display$pct_min)), # the leftmost value of the slider
+                             max = max(t_display$pct_max) + 2      # the rightmost value of the slider
                              ),
     # Make a slider bar of the AE count
     crosstalk::filter_slider(id = "filter_count", 
@@ -220,8 +222,9 @@ forestly <- function(db,
                              sharedData = t_display1, 
                              column = ~n_max, 
                              step = 1, 
-                             width = 250,
-                             min = 0),
+                             #width = 250,
+                             min = max(0, min(t_display$n_min)),
+                             max = max(t_display$n_max) + 2),
     # Make a reactable 
     mk_reactable(  #mk_reactable saved in the R/ folder: define default behavior of reactable.
       
@@ -298,7 +301,9 @@ forestly <- function(db,
         
         # variables helps the slider bar
         pct_max = reactable::colDef(header = "max proportion", show = FALSE),
-        n_max = reactable::colDef(header = "max count", show = FALSE)
+        pct_min = reactable::colDef(header = "min proportion", show = FALSE),
+        n_max = reactable::colDef(header = "max count", show = FALSE),
+        n_min = reactable::colDef(header = "min count", show = FALSE)
       )
     ),
     crosstool::crosstool(t_display1,
