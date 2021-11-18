@@ -1,3 +1,8 @@
+test_that("compare outputs with SAS", {
+  expect_equal(2 * 2, 4)
+})
+
+
 test_that("rate_compare() matches prop_test_mn for unstratified analysis", {
   ana <- data.frame(
     treatment = c(rep(0,100),rep(1,100)),

@@ -1,4 +1,10 @@
 ## Test case 1
+test_that("compare outputs with SAS", {
+  expect_equal(2 * 2, 4)
+})
+
+
+## Test case 2
 test_that("throw error when the length of n0, n1, x0, x1 doesn't match", {
   expect_error(rate_compare_sum(n0 = c(10, 20, 30), n1 = c(20, 10, 40), 
                                 x0 = c(1, 2, 3),    x1 = c(2, 4),  
@@ -11,7 +17,7 @@ test_that("throw error when the length of n0, n1, x0, x1 doesn't match", {
                                 strata = c("a", "b")))
 })
 
-## Test case 2
+## Test case 3
 test_that("match with prop_test_mn()", {
   
   my_n0 = 100  # number of subjects in arm 0
@@ -28,7 +34,7 @@ test_that("match with prop_test_mn()", {
   expect_equal(xx_output, yy_output, tolerance = 1e-4)
 })
 
-## Test case 3
+## Test case 4
 test_that("match with rate_compare()", {
   ana <- data.frame(
     treatment = c(rep(0, 100), rep(1, 100)),

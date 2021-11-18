@@ -180,7 +180,7 @@ tlf_download(temp_dir)
 
 # Construct Interactive Forest Plot
 
-```{r}
+```{r, warning=FALSE}
 forestly(db, 
          fig_prop_color = c("#00857C", "#66203A"),
          fig_prop_label = NULL, # c("Treatment", "Placebo"), 
