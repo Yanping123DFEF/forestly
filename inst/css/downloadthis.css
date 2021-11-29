@@ -1,0 +1,29 @@
+.btn-mk {
+    color: #fff;
+    background-color: #00857c;
+    border-color: #00857c;
+}
+
+.btn-mk:hover {
+    color: #fff;
+    background-color: #005c55;
+    border-color: #005c55
+}
+
+.btn-mk:focus, .btn-mk.focus {
+    color: #fff;
+    background-color: #005c55;
+    border-color: #005c55
+}
+
+.btn-mk:active, .btn-mk.active {
+    color: #fff;
+    background-color: #005c55;
+    border-color: #005c55
+}
+
+.btn-mk.active.focus, .btn-mk.active:focus, .btn-mk.active:hover, .btn-mk:active.focus, .btn-mk:active:focus, .btn-mk:active:hover {
+    color: #fff;
+    background-color: #005c55;
+    border-color: #005c55
+}

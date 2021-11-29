@@ -22,25 +22,33 @@ Title
 \examples{
 library(dplyr)
 temp_dir <- tempdir()
-tlf_ae_summary(population_from = adsl \%>\% rename(TRTA = TRT01A),
-               observation_from = adae,
-               population_where = "ITTFL=='Y'",
-               observation_where = NULL,
-               treatment_var = "TRTA",
-               treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
-               ae_var = "AEDECOD",
-               ae_interested = define_ae_select_list(ae_criterion = c('AESER == "Y"', 'AEREL != "NONE"'),
-                                                     ae_label = c("with serious adverse events",
-                                                                  "with drug-related adverse events")),
-               stratum_var = "STRATUMN", 
-               display_ci = TRUE,
-               display_total = FALSE,
-               title_text = "Analysis of Adverse Event Summary",
-               subtitle_text = NULL,
-               end_notes = "Every subject is counted a single time for each applicable row and column.",
-               output_report = file.path(temp_dir, 'ae0summary.rtf'),
-               output_dataframe = NULL)
-tlf_download(path = temp_dir,
-             output_name = "AE summary table", 
-             button_label = "Download AE summary table")
+tlf_ae_summary(
+  population_from = adsl \%>\% rename(TRTA = TRT01A),
+  observation_from = adae,
+  population_where = "ITTFL=='Y'",
+  observation_where = NULL,
+  treatment_var = "TRTA",
+  treatment_order = c("MK9999" = "Xanomeline High Dose", "Placebo" = "Placebo"),
+  ae_var = "AEDECOD",
+  ae_interested = define_ae_select_list(
+    ae_criterion = c('AESER == "Y"', 'AEREL != "NONE"'),
+    ae_label = c(
+      "with serious adverse events",
+      "with drug-related adverse events"
+    )
+  ),
+  stratum_var = "STRATUMN",
+  display_ci = TRUE,
+  display_total = FALSE,
+  title_text = "Analysis of Adverse Event Summary",
+  subtitle_text = NULL,
+  end_notes = "Every subject is counted a single time for each applicable row and column.",
+  output_report = file.path(temp_dir, "ae0summary.rtf"),
+  output_dataframe = NULL
+)
+tlf_download(
+  path = temp_dir,
+  output_name = "AE summary table",
+  button_label = "Download AE summary table"
+)
 }
