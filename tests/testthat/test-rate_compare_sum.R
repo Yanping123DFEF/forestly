@@ -1,8 +1,46 @@
 ## Test case 1
-test_that("compare outputs with SAS", {
-  expect_equal(2 * 2, 4)
+test_that("compare outputs with SAS (stratified)", {
+  treatment <- c(rep("pbo", 119), rep("exp", 116))
+  response <- c(rep(0, 70), rep(1, 49), rep(0, 46), rep(1, 70))
+  stratum <- c(rep(1:3, 38), 1, 3, 3, 1, 2, 2, rep(1:3, 37), 1,1,2,3)
+  n0 <- sapply(split(treatment[treatment=='pbo'], stratum[treatment=='pbo']), length)
+  n1 <- sapply(split(treatment[treatment=='exp'], stratum[treatment=='exp']), length)
+  x0 <- sapply(split(response[treatment=='pbo'], stratum[treatment=='pbo']), sum)
+  x1 <- sapply(split(response[treatment=='exp'], stratum[treatment=='exp']), sum)
+  strata=c("a","b","c")
+result <- rate_compare_sum(
+     n0,n1,x0,x1,
+     strata,
+     delta = 0,
+     weight = "ss",
+     test = "one.sided",
+     eps = 1e-06,
+     alpha = 0.05
+   )
+# compare with outcome from sas %rate0compare() macro
+expect_equal(result$est, 19.181238694 /100, tolerance = 1e-5)
+expect_equal(result$z_score, 2.9215992269, tolerance = 1e-5)
+expect_equal(result$p, 0.0017411966, tolerance = 1e-5)
+expect_equal(result$lower, 6.3398653094 / 100, tolerance = 1e-5)
+expect_equal(result$upper, 31.395972269 / 100, tolerance = 1e-5)
 })
 
+test_that("compare outputs with SAS (unstratified)", {
+  result <- rate_compare_sum(
+    n0 = 119,n1 = 116, x0 = 70, x1=46,
+    delta = 0,
+    weight = "ss",
+    test = "one.sided",
+    eps = 1e-06,
+    alpha = 0.05
+  )
+  # compare with outcome from sas %rate0compare() macro
+  expect_equal(result$est, -19.168357 /100, tolerance = 1e-5)
+  expect_equal(result$z_score, -2.932194791, tolerance = 1e-5)
+  expect_equal(result$p, 0.9983171222, tolerance = 1e-5)
+  expect_equal(result$lower, -31.33431419 / 100, tolerance = 1e-5)
+  expect_equal(result$upper, -6.382126982 / 100, tolerance = 1e-5)
+})
 
 ## Test case 2
 test_that("throw error when the length of n0, n1, x0, x1 doesn't match", {
