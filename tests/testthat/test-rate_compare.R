@@ -1,7 +1,45 @@
-test_that("compare outputs with SAS", {
-  expect_equal(2 * 2, 4)
+test_that("compare outputs with SAS (stratified)", {
+  treatment <- c(rep("pbo", 119), rep("exp", 116))
+  response <- c(rep(0, 70), rep(1, 49), rep(0, 46), rep(1, 70))
+  stratum <- c(rep(1:3, 38), 1, 3, 3, 1, 2, 2, rep(1:3, 37), 1,1, 2, 3)
+
+  result <- rate_compare(
+     formula = response ~ factor(treatment, levels = c("pbo", "exp")),
+     strata = stratum,
+     delta = 0,
+     weight = "cmh",
+     test = "one.sided",
+     eps = 1e-06,
+     alpha = 0.05
+  )
+  # compare with outcome from sas %rate0compare() macro
+  expect_equal(result$est, 19.181363786 /100, tolerance = 1e-5)
+  expect_equal(result$z_score, 2.9216181843, tolerance = 1e-5)
+  expect_equal(result$p, 0.0017410907, tolerance = 1e-5)
+  expect_equal(result$lower, 6.3399769229 / 100, tolerance = 1e-5)
+  expect_equal(result$upper, 31.396078455 / 100, tolerance = 1e-5)
 })
 
+test_that("compare outputs with SAS (unstratified)", {
+  
+  treatment <- c(rep("pbo", 119), rep("exp", 116))
+  response <- c(rep(0, 70), rep(1, 49), rep(0, 46), rep(1, 70))
+  
+  result <- rate_compare(
+    formula = response ~ factor(treatment, levels = c("pbo", "exp")),
+    delta = 0,
+    weight = "equal",
+    test = "two.sided",
+    eps = 1e-06,
+    alpha = 0.05
+  )
+  # compare with outcome from sas %rate0compare() macro
+  expect_equal(result$est, 19.168356998 /100, tolerance = 1e-5)
+  expect_equal(result$z_score, 2.9321947913, tolerance = 1e-5)
+  expect_equal(result$p, 0.0033657557, tolerance = 1e-5)
+  expect_equal(result$lower, 6.3821269823 / 100, tolerance = 1e-5)
+  expect_equal(result$upper, 31.334314192 / 100, tolerance = 1e-5)
+})
 
 test_that("rate_compare() matches prop_test_mn for unstratified analysis", {
   ana <- data.frame(
