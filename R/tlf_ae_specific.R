@@ -155,14 +155,14 @@ tlf_ae_specific <- function(population_from,
   t_pop[["pval"]] <- c(NA, pval)
   t_pop[["total"]] <- t_pop[["exp"]] + t_pop[["pbo"]]
   
-  t_pop$total_CI <- c(NA, format(round(t_pop$total[-1] / t_pop$total[1] * 100), nsmall = 1))
+  t_pop$total_CI <- c(NA, format(round(t_pop$total[-1] / t_pop$total[1] * 100,1), nsmall = 1))
   
   # count the ae count 
   ##count the soc
   if (!is.null(ae_grp)){
     soc_unique <- unique(pop_db[, c("USUBJID","trt_label","aebodsys")])
     soc_n <- data.frame(unclass(table(soc_unique$aebodsys, soc_unique$trt_label)))
-    soc_prop <- data.frame(format(round(soc_n/pop_n * 100, 1), nsmall = 1))
+    soc_prop <- data.frame(format(round(t(t(soc_n)/pop_n) * 100, 1), nsmall = 1))
     names(soc_prop) <- paste(names(soc_prop), "_CI", sep = "")
     soc <- data.frame(soc_n,soc_prop)
     soc$aedecod <- row.names(soc_n)
@@ -177,7 +177,7 @@ tlf_ae_specific <- function(population_from,
   ##count the specific ae 
   ae_unique <- unique(db[,c("USUBJID","trt_label","aedecod","aebodsys")])
   ae_n <- data.frame(unclass(table(ae_unique$aedecod, ae_unique$trt_label)))
-  ae_prop <- data.frame(format(round(ae_n/pop_n * 100, 1), nsmall = 1))
+  ae_prop <- data.frame(format(round(t(t(ae_n)/pop_n) * 100, 1), nsmall = 1))
   names(ae_prop) <- paste(names(ae_prop), "_CI", sep = "")
   ae <- data.frame(ae_n, ae_prop)
   ae$aedecod <- row.names(ae)
@@ -191,7 +191,7 @@ tlf_ae_specific <- function(population_from,
   
   ##calculate TOTAL
   soc_ae$total <- soc_ae[["exp"]] + soc_ae[["pbo"]]
-  soc_ae$total_CI <- format(round(soc_ae$total / t_pop$total[1]*100), nsmall = 1)
+  soc_ae$total_CI <- format(round(soc_ae$total / t_pop$total[1]*100,1), nsmall = 1)
   
   ##calculate CI with or with stratified
   if (is.null(stratum_var)){
