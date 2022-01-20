@@ -41,7 +41,7 @@
 #'                                                       ae_label = c("with serious adverse events",
 #'                                                                    "with drug-related adverse events",
 #'                                                                    "discontinued due to an adverse event")),
-#'                 stratum_var = NULL,
+#'                 stratum_var ="SEX",
 #'                 display_ci = TRUE,
 #'                 display_total = FALSE,
 #'                 title_text = "Analysis of Adverse Event Summary", 
@@ -73,13 +73,18 @@ tlf_ae_summary <- function(population_from,
                          population_where = population_where,
                          treatment_var    = treatment_var,
                          treatment_order  = treatment_order,
+                         stratum_var      = stratum_var,
                          baseline_var     = NULL)
-  
+  pop[["trt_label"]] <- ifelse(pop$treatment == names(treatment_order)[1], "exp", "pbo")
+  pop[["trt_label"]] <- factor(pop[["trt_label"]], levels = c("exp", "pbo"))
   # Select the Desired Observation
   db <- tidy_observation(observation_from = observation_from,
                          observation_where = observation_where,
                          treatment_var    = treatment_var,
-                         treatment_order  = treatment_order)
+                         treatment_order  = treatment_order,
+                         stratum_var      = stratum_var)
+  db[["trt_label"]] <- ifelse(db$treatment == names(treatment_order)[1],"exp","pbo")
+  db[["trt_label"]] <- factor(db[["trt_label"]], levels = c("exp","pbo"))
   
   # select the overlap pop(adsl) and db(adae)
   db[["ae"]] <- tools::toTitleCase(tolower(db[[ae_var]])) 
@@ -139,19 +144,23 @@ tlf_ae_summary <- function(population_from,
     res_new <- res_new  %>%
       mutate(across(starts_with("pct"), ~ round(.x, digits = 4)))
     if(display_ci){
-      n0 <- db_N$N[db_N$treatment[2]]
-      n1 <- db_N$N[db_N$treatment[1]]
-      x0 <- res_new$n_1
-      x1 <- res_new$n_2
+      pop_db <- merge(pop,db_ae_interested,by = c('USUBJID', "trt_label", "stratum", "treatment"))
+      pop_n_str <- sapply(split(pop$trt_label, paste(pop$trt_label, pop$stratum, sep = "_")), length)
+      pop_db$trt_str <- factor(paste(pop_db$trt_label, pop_db$stratum, sep = "_"), levels = names(pop_n_str))
+      strata_level <- sub(".*_", "", names(pop_n_str))[1 : length(unique(pop$stratum))]  
+      uni <- unique(pop_db[,c("USUBJID", "trt_label", "stratum", "trt_str")])
+      db_n_str <- sapply(split(uni$trt_label, uni$trt_str), length)
       
-      stat <- rate_compare_sum(
-        n0, n1, x0, x1,
-        delta = 0,
-        weight = "ss",
-        strata = stratum_var,
-        test = "one.sided",
-        alpha = 0.05
-      )
+      pop_n0 <- pop_n_str[grepl(levels(pop$trt_label)[2], names(pop_n_str))]
+      pop_n1 <- pop_n_str[grepl(levels(pop$trt_label)[1], names(pop_n_str))]
+      db_s0 <- db_n_str[grepl(levels(pop$trt_label)[2], names(db_n_str))]
+      db_s1 <- db_n_str[grepl(levels(pop$trt_label)[1], names(db_n_str))]
+
+      stat <- rate_compare_sum(n0 = pop_n0, n1 = pop_n1, 
+                               x0 = db_s0, x1 = db_s1, 
+                               strata = strata_level, 
+                               delta = 0, weight = "ss",
+                               test = "one.sided", alpha = 0.05)
       
       res_new$est <- paste0(round(stat[[1]] * 100, 1), "(", round(stat[[4]], 1), ", ", round(stat[[5]], 1), ")")
       res_new$pvalue <- round(stat[[3]], 4)
@@ -176,7 +185,7 @@ tlf_ae_summary <- function(population_from,
   
   # output rtf file
   if(display_total == FALSE & display_ci == FALSE){
-    x<- tbl_ae_summary %>%
+    x<- tbl_ae_summary[,1:5] %>%
       r2rtf::rtf_title(title_text, 
                        subtitle_text) %>%
       
@@ -184,7 +193,7 @@ tlf_ae_summary <- function(population_from,
                            col_rel_width = c(3, rep(2, length(unique(pop$treatment))))
       ) %>%
       r2rtf::rtf_colheader(" | n | (%) | n | (%) ",
-                           border_top = c("",rep("single", 3 * length(unique(pop$treatment)))),
+                           border_top = c("",rep("single", 2 * length(unique(pop$treatment)))),
                            border_bottom = "single",
                            border_left = c("single", rep(c("single", ""), length(unique(pop$treatment)))),
                            col_rel_width = c(3, rep(1, 2 * length(unique(pop$treatment))))
