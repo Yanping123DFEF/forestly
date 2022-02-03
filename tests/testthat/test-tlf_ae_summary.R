@@ -27,7 +27,9 @@ db <- tibble(
     "RESPIRATORY, THORACIC AND MEDIASTINAL DISORDERS", "GASTROINTESTINAL DISORDERS", "GASTROINTESTINAL DISORDERS", "GASTROINTESTINAL DISORDERS"
   ),
   AESER = c("N", "N", "N", "Y", "N", "N", "N", "Y", "N"),
-  AEREL = c("N", "Y", "N", "N", "N", "Y", "N", "N", "Y")
+  AEREL = c("N", "Y", "N", "N", "N", "Y", "N", "N", "Y"),
+  SAFFL = c("Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y", "Y"),
+  TRTEMFL = c("Y", "Y", "N", "Y", "Y", "Y", "N", "Y", "Y")
 )
 
 test_that("expect warning if user wants to dispaly ci and total", {
@@ -73,12 +75,12 @@ test_that("dispaly ci in ae summary", {
   
   load(file.path(tempdir(), 'ae0summary.RData'))
   
-  expect_equal(as.numeric(x$n_1), c(4,1,3))
-  expect_equal(as.numeric(x$pct_1), c(NA,25, 75))
-  expect_equal(as.numeric(x$n_2), c(2,1,2))
-  expect_equal(as.numeric(x$pct_2), c(NA,50, 100))
-  expect_equal(as.character(x$est), c(NA, "-25(-0.8, 0.5)", "-25(-0.7, 0.5)"))
-  expect_equal(as.numeric(x$pvalue), c(NA,0.7119, 0.7602))
+  expect_equal(as.numeric(x$n_1), c(4,3,1,1,3))
+  expect_equal(as.numeric(x$pct_1), c(NA,75, 25, 25, 75))
+  expect_equal(as.numeric(x$n_2), c(2,1, 1, 1, 2))
+  expect_equal(as.numeric(x$pct_2), c(NA,50, 50, 50, 100))
+  expect_equal(as.character(x$est), c(NA, "25.0(-0.5, 0.8)", "-25.0(-0.8, 0.5)","-25.0(-0.8, 0.5)", "-25.0(-0.7, 0.5)"))
+  expect_equal(as.numeric(x$pvalue), c(NA,0.288, 0.712, 0.712, 0.760))
   
   encode <- paste(readLines(file.path(tempdir(), "ae0summary.rtf")), collapse = "\n")
   expect_snapshot_output(encode)
@@ -107,12 +109,12 @@ test_that("dispaly total in ae summary", {
   
   load(file.path(tempdir(), 'ae0summary.RData'))
   
-  expect_equal(as.numeric(x$n_1), c(4,1,3))
-  expect_equal(as.numeric(x$pct_1), c(NA,25, 75))
-  expect_equal(as.numeric(x$n_2), c(2,1,2))
-  expect_equal(as.numeric(x$pct_2), c(NA,50, 100))
-  expect_equal(as.numeric(x$tot_n), c(6,2,5))
-  expect_equal(as.numeric(x$tot_pct), c(NA,33.3, 83.3))
+  expect_equal(as.numeric(x$n_1), c(4, 3, 1,1,3))
+  expect_equal(as.numeric(x$pct_1), c(NA,75, 25, 25, 75))
+  expect_equal(as.numeric(x$n_2), c(2,1, 1, 1,2))
+  expect_equal(as.numeric(x$pct_2), c(NA,50, 50, 50, 100))
+  expect_equal(as.numeric(x$tot_n), c(6, 4, 2, 2,5))
+  expect_equal(as.numeric(x$tot_pct), c(NA,66.7, 33.3, 33.3, 83.3))
   
   encode <- paste(readLines(file.path(tempdir(), "ae0summary.rtf")), collapse = "\n")
   expect_snapshot_output(encode)
@@ -141,10 +143,10 @@ test_that("dispaly no ci and total in ae summary", {
   
   load(file.path(tempdir(), 'ae0summary.RData'))
   
-  expect_equal(as.numeric(x$n_1), c(4,1,3))
-  expect_equal(as.numeric(x$pct_1), c(NA,25, 75))
-  expect_equal(as.numeric(x$n_2), c(2,1,2))
-  expect_equal(as.numeric(x$pct_2), c(NA,50, 100))
+  expect_equal(as.numeric(x$n_1), c(4,3, 1, 1,3))
+  expect_equal(as.numeric(x$pct_1), c(NA,75, 25, 25, 75))
+  expect_equal(as.numeric(x$n_2), c(2,1,1,1,2))
+  expect_equal(as.numeric(x$pct_2), c(NA,50, 50, 50, 100))
   
   encode <- paste(readLines(file.path(tempdir(), "ae0summary.rtf")), collapse = "\n")
   expect_snapshot_output(encode)
@@ -173,14 +175,15 @@ test_that("stratum_var not null", {
   
   load(file.path(tempdir(), 'ae0summary.RData'))
   
-  expect_equal(as.numeric(x$n_1), c(4,1,3))
-  expect_equal(as.numeric(x$pct_1), c(NA,25, 75))
-  expect_equal(as.numeric(x$n_2), c(2,1,2))
-  expect_equal(as.numeric(x$pct_2), c(NA,50, 100))
-  expect_equal(as.character(x$est), c(NA, "-25(-0.8, 0.5)", "-25(-0.8, 0.6)"))
-  expect_equal(as.numeric(x$pvalue), c(NA,0.6915, 0.7602))
+  expect_equal(as.numeric(x$n_1), c(4,3, 1, 1,3))
+  expect_equal(as.numeric(x$pct_1), c(NA,75, 25, 25, 75))
+  expect_equal(as.numeric(x$n_2), c(2,1,1,1,2))
+  expect_equal(as.numeric(x$pct_2), c(NA,50, 50, 50, 100))
+  expect_equal(as.character(x$est), c(NA, "25.0(-0.5, 0.8)", "-25.0(-0.8, 0.5)", "-25.0(-0.8, 0.5)", "-25.0(-0.8, 0.6)"))
+  expect_equal(as.numeric(x$pvalue), c(NA,0.240, 0.760, 0.691, 0.760))
   
   encode <- paste(readLines(file.path(tempdir(), "ae0summary.rtf")), collapse = "\n")
   expect_snapshot_output(encode)
   
 })
+

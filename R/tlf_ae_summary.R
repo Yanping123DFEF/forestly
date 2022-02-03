@@ -46,9 +46,9 @@
 #'                 display_total = FALSE,
 #'                 title_text = "Analysis of Adverse Event Summary", 
 #'                 subtitle_text = NULL,
-#'                 end_notes ="Every subject is counted a single time for each applicable row and column.",
 #'                 output_report = file.path(tempdir(), 'ae0summary.rtf'),
-#'                 output_dataframe = file.path(tempdir(), 'ae0summary.RData'))
+#'                 output_dataframe = file.path(tempdir(), 'ae0summary.RData'),
+#'                 end_notes ="Every subject is counted a single time for each applicable row and column.")
 
 tlf_ae_summary <- function(population_from,
                            observation_from,
@@ -110,9 +110,8 @@ tlf_ae_summary <- function(population_from,
     res$tot_n <- res$n_1 + res$n_2
   }
   
-  if(is.null(ae_interested)){
-    return(res)
-  }
+  ae_interested$interested_ae_criterion <- c("SAFFL=='Y' & TRTEMFL=='Y'", "!(SAFFL=='Y' & TRTEMFL=='Y')", ae_interested$interested_ae_criterion)
+  ae_interested$interested_ae_label <- c("with one or more adverse event", "with no adverse event", ae_interested$interested_ae_label)
   
   interested_ae_criterion <- ae_interested$interested_ae_criterion
   interested_ae_label <- ae_interested$interested_ae_label
@@ -162,9 +161,10 @@ tlf_ae_summary <- function(population_from,
                                delta = 0, weight = "ss",
                                test = "one.sided", alpha = 0.05)
       
-      res_new$est <- paste0(round(stat[[1]] * 100, 1), "(", round(stat[[4]], 1), ", ", round(stat[[5]], 1), ")")
-      res_new$pvalue <- round(stat[[3]], 4)
-      res_new$pvalue[is.nan(res_new$pvalue)] = NA
+      res_new$est <- paste0(format(round(stat[[1]] * 100, 1), nsmall = 1), "(", format(round(stat[[4]], 1), nsmall = 1), ", ", 
+                            format(round(stat[[5]], 1), nsmall = 1), ")")
+      res_new$pvalue <- format(round(stat[[3]], 3), nsmall = 3)
+      res_new$pvalue[is.nan(as.numeric(res_new$pvalue))] <- NA
     }  
     
     if(display_total){
