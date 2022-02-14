@@ -187,3 +187,63 @@ test_that("stratum_var not null", {
   
 })
 
+test_that("ae_interested equal to 'null'", {
+  tlf_ae_summary(population_from = tb,
+                 observation_from = db,
+                 population_where = NULL,
+                 observation_where = NULL,
+                 treatment_var = "treatment",
+                 treatment_order = treatment_order,
+                 ae_var = "AEDECOD",
+                 ae_interested = "NULL",
+                 stratum_var = NULL,
+                 display_ci = FALSE,
+                 display_total = FALSE,
+                 title_text = "Analysis of Adverse Event Summary", 
+                 subtitle_text = NULL,
+                 end_notes ="Every subject is counted a single time for each applicable row and column.",
+                 output_report = file.path(tempdir(), 'ae0summary.rtf'),
+                 output_dataframe = file.path(tempdir(), 'ae0summary.RData'))
+  
+  load(file.path(tempdir(), 'ae0summary.RData'))
+  
+  expect_equal(as.numeric(x$n_1), c(4,3, 1))
+  expect_equal(as.numeric(x$pct_1), c(NA,75, 25))
+  expect_equal(as.numeric(x$n_2), c(2,1,1))
+  expect_equal(as.numeric(x$pct_2), c(NA,50, 50))
+  
+  encode <- paste(readLines(file.path(tempdir(), "ae0summary.rtf")), collapse = "\n")
+  expect_snapshot_output(encode)
+  
+})
+
+test_that("no end note", {
+  tlf_ae_summary(population_from = tb,
+                 observation_from = db,
+                 population_where = NULL,
+                 observation_where = NULL,
+                 treatment_var = "treatment",
+                 treatment_order = treatment_order,
+                 ae_var = "AEDECOD",
+                 ae_interested = NULL,
+                 stratum_var = NULL,
+                 display_ci = FALSE,
+                 display_total = FALSE,
+                 title_text = "Analysis of Adverse Event Summary", 
+                 subtitle_text = NULL,
+                 end_notes =NULL,
+                 output_report = file.path(tempdir(), 'ae0summary.rtf'),
+                 output_dataframe = file.path(tempdir(), 'ae0summary.RData'))
+  
+  load(file.path(tempdir(), 'ae0summary.RData'))
+  
+  expect_equal(as.numeric(x$n_1), c(4,3, 1))
+  expect_equal(as.numeric(x$pct_1), c(NA,75, 25))
+  expect_equal(as.numeric(x$n_2), c(2,1,1))
+  expect_equal(as.numeric(x$pct_2), c(NA,50, 50))
+  
+  encode <- paste(readLines(file.path(tempdir(), "ae0summary.rtf")), collapse = "\n")
+  expect_snapshot_output(encode)
+  
+})
+

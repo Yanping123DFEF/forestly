@@ -110,6 +110,12 @@ tlf_ae_summary <- function(population_from,
     res$tot_n <- res$n_1 + res$n_2
   }
   
+  if(!is.null(ae_interested)){
+    if(tolower(ae_interested)=="null"){
+      ae_interested <- as.null(ae_interested)
+    }
+  }
+  
   ae_interested$interested_ae_criterion <- c("SAFFL=='Y' & TRTEMFL=='Y'", "!(SAFFL=='Y' & TRTEMFL=='Y')", ae_interested$interested_ae_criterion)
   ae_interested$interested_ae_label <- c("with one or more adverse event", "with no adverse event", ae_interested$interested_ae_label)
   
@@ -202,18 +208,7 @@ tlf_ae_summary <- function(population_from,
         col_rel_width = c(3,  rep(1, 2 * length(unique(pop$treatment)))),
         border_left = c("single", rep(c("single", ""), length(unique(pop$treatment)))),
         text_justification = c("l", rep("c", 2 * length(unique(pop$treatment))))
-        ) %>% 
-      r2rtf::rtf_footnote(end_notes) 
-    
-    if(!is.null(output_report)){
-      x %>% 
-        r2rtf::rtf_encode() %>%
-        r2rtf::write_rtf(output_report)
-    }
-    
-    if(!is.null(output_dataframe)){
-      save(x, file = output_dataframe)
-    }
+        ) 
       
   }
   
@@ -235,17 +230,7 @@ tlf_ae_summary <- function(population_from,
       r2rtf::rtf_body(
         col_rel_width = c(3,  rep(1, 2 * length(unique(pop$treatment))), 2, 1),
         border_left = c("single", rep(c("single", ""),length(unique(pop$treatment))), "single", "single"),
-        text_justification = c("l", rep("c", 3 * length(unique(pop$treatment))))) %>% 
-      r2rtf::rtf_footnote(end_notes) 
-    
-    if(!is.null(output_report)){
-      x %>% r2rtf::rtf_encode() %>%
-        r2rtf::write_rtf(output_report)
-    }
-    
-    if(!is.null(output_dataframe)){
-      save(x, file = output_dataframe)
-    }
+        text_justification = c("l", rep("c", 3 * length(unique(pop$treatment))))) 
   }
   
   if(display_total){
@@ -266,19 +251,23 @@ tlf_ae_summary <- function(population_from,
       r2rtf::rtf_body(
         col_rel_width = c(3,  rep(1, 2 * length(unique(pop$treatment))), 1, 1),
         border_left = c("single",rep(c("single", ""), length(unique(pop$treatment))), "single", "single"),
-        text_justification = c("l", rep("c", 3 * length(unique(pop$treatment))))) %>% 
-      
-      r2rtf::rtf_footnote(end_notes) 
-    
-    if(!is.null(output_report)){
-      x %>% 
-        r2rtf::rtf_encode() %>%
-        r2rtf::write_rtf(output_report)
-    }
-    
-    if(!is.null(output_dataframe)){
-      save(x, file = output_dataframe)
-    }
+        text_justification = c("l", rep("c", 3 * length(unique(pop$treatment))))) 
+  }
+  
+  
+  if(!is.null(end_notes)){
+    x <- x %>% 
+      r2rtf::rtf_footnote(end_notes)
+  }
+  
+  if(!is.null(output_report)){
+    x %>% 
+      r2rtf::rtf_encode() %>%
+      r2rtf::write_rtf(output_report)
+  }
+  
+  if(!is.null(output_dataframe)){
+    save(x, file = output_dataframe)
   }
   
 }
