@@ -110,17 +110,15 @@ tlf_ae_summary <- function(population_from,
     res$tot_n <- res$n_1 + res$n_2
   }
   
-  if(!is.null(ae_interested)){
-    if(tolower(ae_interested)=="null"){
-      ae_interested <- as.null(ae_interested)
-    }
-  }
+  interested_ae_label_1 <- ifelse("null" %in% tolower(ae_interested$interested_ae_criterion),
+    ae_interested$interested_ae_label[tolower(ae_interested$interested_ae_criterion)=="null"],
+    "with one or more adverse event")
   
   ae_interested$interested_ae_criterion <- c("SAFFL=='Y' & TRTEMFL=='Y'", "!(SAFFL=='Y' & TRTEMFL=='Y')", ae_interested$interested_ae_criterion)
-  ae_interested$interested_ae_label <- c("with one or more adverse event", "with no adverse event", ae_interested$interested_ae_label)
+  ae_interested$interested_ae_label <- c(interested_ae_label_1, "with no adverse event", ae_interested$interested_ae_label)
   
-  interested_ae_criterion <- ae_interested$interested_ae_criterion
-  interested_ae_label <- ae_interested$interested_ae_label
+  interested_ae_criterion <- ae_interested$interested_ae_criterion[!tolower(ae_interested$interested_ae_criterion)=="null"]
+  interested_ae_label <- ae_interested$interested_ae_label[!tolower(ae_interested$interested_ae_criterion)=="null"]
   
   ## For each interested AE, iteration once and rbind them together
   for (ae_idx in seq_along(interested_ae_criterion)) {
