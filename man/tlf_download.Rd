@@ -37,7 +37,7 @@ tlf_ae_summary(
       "with drug-related adverse events"
     )
   ),
-  stratum_var = "STRATUMN",
+  stratum_var = NULL,
   display_ci = TRUE,
   display_total = FALSE,
   title_text = "Analysis of Adverse Event Summary",
