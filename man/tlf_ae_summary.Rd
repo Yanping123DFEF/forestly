@@ -82,12 +82,12 @@ tlf_ae_summary(population_from = adsl \%>\% rename(TRTA = TRT01A),
                                                       ae_label = c("with serious adverse events",
                                                                    "with drug-related adverse events",
                                                                    "discontinued due to an adverse event")),
-                stratum_var = NULL,
+                stratum_var ="SEX",
                 display_ci = TRUE,
                 display_total = FALSE,
                 title_text = "Analysis of Adverse Event Summary", 
                 subtitle_text = NULL,
-                end_notes ="Every subject is counted a single time for each applicable row and column.",
                 output_report = file.path(tempdir(), 'ae0summary.rtf'),
-                output_dataframe = file.path(tempdir(), 'ae0summary.RData'))
+                output_dataframe = file.path(tempdir(), 'ae0summary.RData'),
+                end_notes ="Every subject is counted a single time for each applicable row and column.")
 }
